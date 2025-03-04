@@ -23,7 +23,8 @@ class RoleController extends Controller
             'name' => $request->name,
             'display_name_ar' => $request->display_name_ar,
             'display_name_en' => $request->display_name_en,
-            'guard_name' => 'sanctum', // ✅ تأكد من استخدام `sanctum`
+            // 'guard_name' => 'sanctum', // ✅ تأكد من استخدام `sanctum`
+            'guard_name' => 'web',
         ]);
 
         // إسناد الصلاحيات للدور الجديد

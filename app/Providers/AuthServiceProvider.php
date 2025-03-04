@@ -3,6 +3,8 @@
 namespace App\Providers;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Laravel\Sanctum\Sanctum;
+
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -27,5 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         // تأكد من تسجيل Spatie Permissions
         Role::class;
         Permission::class;
+        Sanctum::ignoreMigrations(false);
+
     }
 }
