@@ -15,7 +15,10 @@ class RoleSeeder extends Seeder
             'create users',
             'edit users',
             'delete users',
-            'view users'
+            'view users',
+            'manage projects',
+            'assign tasks',
+            'approve requests',
         ];
 
         foreach ($permissions as $permission) {
@@ -30,5 +33,15 @@ class RoleSeeder extends Seeder
 
         // إعطاء Super Admin كافة الصلاحيات
         $superAdmin->givePermissionTo(Permission::all());
+
+        // إعطاء Team Lead صلاحيات معينة
+        $teamLead->givePermissionTo(['view users', 'assign tasks']);
+
+        // إعطاء HR صلاحيات معينة
+        $hr->givePermissionTo(['view users', 'approve requests']);
+
+        // إعطاء User صلاحية محددة
+        $user->givePermissionTo(['view users']);
     }
 }
+

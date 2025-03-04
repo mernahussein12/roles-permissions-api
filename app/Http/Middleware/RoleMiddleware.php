@@ -10,7 +10,8 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, $role): Response
     {
-        if (!$request->user() || $request->user()->role !== $role) {
+        // التحقق من أن المستخدم مسجّل الدخول ولديه الدور المطلوب
+        if (!$request->user() || !$request->user()->hasRole($role)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
