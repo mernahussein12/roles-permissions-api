@@ -11,16 +11,13 @@ use Exception;
 
 class AuthController extends Controller
 {
-    // تسجيل مستخدم جديد (فقط super_admin يمكنه إنشاء مستخدمين)
     public function register(Request $request)
     {
         try {
-            // تحقق من أن المستخدم الحالي هو super_admin
             if (auth()->user()->role !== 'super_admin') {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
 
-            // التحقق من البيانات المدخلة
             $request->validate([
                 'name' => 'required',
                 'email' => 'required|email|unique:users,email',
@@ -28,7 +25,6 @@ class AuthController extends Controller
                 'role' => 'required|in:super_admin,team_lead,hr,user',
             ]);
 
-            // إنشاء المستخدم
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
@@ -67,8 +63,32 @@ class AuthController extends Controller
                 ]);
             }
 
+            $token = $user->createToken('authToken')->plainTextToken;
+
             return response()->json([
-                'token' => $user->createToken('authToken')->plainTextToken
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'type' => $user->type ?? 'user',
+                'preferred_locale' => $user->preferred_locale ?? 'en',
+                'gender' => $user->gender ?? 'unknown',
+                'phone' => $user->phone ?? '',
+                'image' => $user->image ? asset($user->image) : 'https://example.com/default-avatar.jpg',
+                'token' => $token,
+                'roles' => $user->roles()->with(['permissions' => function ($query) {
+                    $query->select('id', 'name');
+                }])->get()->map(function ($role) {
+                    return [
+                        'id' => $role->id,
+                        'name' => $role->name,
+                        'permissions' => $role->permissions->map(function ($permission) use ($role) {
+                            return [
+                                'id' => $permission->id,
+                                'name' => $permission->name,
+                            ];
+                        })
+                    ];
+                }),
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -77,6 +97,8 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+
 
     // تسجيل الخروج
     public function logout(Request $request)

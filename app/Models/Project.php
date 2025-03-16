@@ -13,4 +13,8 @@ class Project extends Model
         'project_name', 'project_type', 'price_offer', 'cost',
         'initial_payment', 'profit_margin', 'hosting', 'technical_support'
     ];
+
+    // protected $attributes = [
+    //     'status' => 'pending',
+    // ];
 }

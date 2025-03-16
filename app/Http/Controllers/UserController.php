@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Http\JsonResponse;
+use Exception;
 
 class UserController extends Controller
 {
@@ -85,5 +87,66 @@ class UserController extends Controller
         $roles = Role::all(['id', 'name']);
         return response()->json($roles);
     }
+
+    public function getTeamByDepartment(Request $request): JsonResponse
+{
+    try {
+        // التحقق من وجود قسم في الطلب
+        if (!$request->has('department')) {
+            return response()->json([
+                'message' => 'يرجى تحديد القسم المطلوب'
+            ], 400);
+        }
+
+        $department = $request->department;
+
+        // جلب جميع المستخدمين الذين ينتمون إلى القسم المحدد
+        $team = User::where('department', $department)
+            ->select('id as value', 'name as label')
+            ->get();
+
+        return response()->json([
+            'message' => "تم جلب الفريق بنجاح للقسم: $department",
+            'team' => $team
+        ], 200);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'حدث خطأ أثناء جلب الفريق',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function getTeamLeaders(Request $request)
+{
+    $department = $request->query('department');
+
+    if (!$department) {
+        return response()->json([
+            'message' => 'يجب تحديد القسم المطلوب',
+            'team_leaders' => []
+        ], 400);
+    }
+
+    $teamLeaders = User::where('department', $department)
+        ->whereIn('role', ['team_lead', 'Leader'])
+        ->select('id as value', 'name as label', 'role')
+        ->get()
+        ->map(function ($user) {
+            return [
+                'value' => $user->value,
+                'label' => $user->label,
+                'role' => $user->role
+            ];
+        });
+
+    return response()->json([
+        'message' => "تم جلب القادة بنجاح للقسم: $department",
+        'team_leaders' => $teamLeaders
+    ], 200);
+}
+
+
+
 }
 

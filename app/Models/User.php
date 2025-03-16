@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -47,8 +48,27 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
     protected $with = ['roles'];
-    // public function role()
+
+    public function developers(): BelongsToMany
+    {
+        return $this->belongsToMany(Developer::class, 'developer_user', 'user_id', 'developer_id');
+    }
+    public function marketings(): BelongsToMany
+    {
+        return $this->belongsToMany(Marketing::class, 'marketing_users', 'user_id', 'marketing_id');
+    }
+
+
+
+    // المشاريع التي يقودها المستخدم
+    // public function ledProjects()
     // {
-    //     return $this->belongsTo(Role::class);
+    //     return $this->hasMany(Developer::class, 'project_leader');
+    // }
+
+    // // المشاريع التي يدعمها المستخدم
+    // public function supportedProjects()
+    // {
+    //     return $this->hasMany(Developer::class, 'support');
     // }
 }

@@ -24,6 +24,8 @@ class ProjectResource extends JsonResource
             'profit_margin' => $this->profit_margin,
             'hosting' => $this->hosting,
             'technical_support' => $this->technical_support,
+            'status'    => $this->status ?? 'pending', // تأكد من تضمين الحالة الافتراضية
+
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
